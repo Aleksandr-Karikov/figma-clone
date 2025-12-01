@@ -1,3 +1,5 @@
-// Store package exports
+/**
+ * Store package exports
+ */
 export * from './canvasStore';
 

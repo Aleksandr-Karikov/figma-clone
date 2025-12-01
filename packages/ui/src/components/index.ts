@@ -1,4 +1,5 @@
-// UI components exports
-// TODO: Export React components
-export {};
-
+/**
+ * UI components exports
+ */
+export * from './Canvas';
+export * from './Toolbar';

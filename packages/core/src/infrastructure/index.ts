@@ -1,4 +1,4 @@
-// Infrastructure exports
-// TODO: Export renderer and other infrastructure
-export {};
-
+/**
+ * Infrastructure exports
+ */
+export * from './renderers';

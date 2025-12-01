@@ -21,14 +21,17 @@ yarn build
 figma-clone/
 ├── apps/
 │   ├── web/              # React frontend (Vite + React 18)
+│   │   ├── src/
+│   │   │   ├── components/  # Canvas, Toolbar, PropertyPanel
+│   │   │   ├── store/       # Zustand state management
+│   │   │   └── hooks/       # Application hooks
+│   │   └── ...
 │   └── api/              # NestJS backend (Fastify)
 ├── packages/
-│   ├── core/             # Shared @figma-clone/core
-│   │   ├── domain/       # Business logic & types
-│   │   ├── application/  # Use cases
-│   │   └── infrastructure/ # External dependencies
-│   ├── ui/               # React components
-│   └── store/            # Zustand state management
+│   └── core/             # Shared @figma-clone/core
+│       ├── domain/       # Business logic & types
+│       ├── application/  # Use cases
+│       └── infrastructure/ # External dependencies (renderers)
 └── context/              # Architecture documentation
 ```
 

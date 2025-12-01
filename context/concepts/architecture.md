@@ -32,22 +32,23 @@ Infrastructure Layer (External dependencies)
 
 ```
 packages/
-├── core/                    # Domain + Application + Infrastructure
-│   ├── domain/              # Business logic (pure)
-│   │   ├── shapes/          # Shape models
-│   │   ├── document/        # Document model
-│   │   └── operations/      # Operations (commands)
-│   ├── application/         # Use cases
-│   └── infrastructure/      # External dependencies
-│       ├── renderers/       # Graphics abstraction
-│       ├── api/             # HTTP clients
-│       └── realtime/        # WebSocket client
-├── ui/                      # UI Layer
-│   ├── components/          # React components
-│   ├── canvas/              # Canvas component
-│   └── toolbar/             # Toolbar
-└── store/                   # State Management
-    └── canvasStore.ts       # Zustand store
+└── core/                    # Domain + Application + Infrastructure
+    ├── domain/              # Business logic (pure)
+    │   ├── shapes/          # Shape models
+    │   ├── document/        # Document model
+    │   └── operations/      # Operations (commands)
+    ├── application/         # Use cases
+    └── infrastructure/      # External dependencies
+        ├── renderers/       # Graphics abstraction
+        ├── api/             # HTTP clients
+        └── realtime/        # WebSocket client
+
+apps/
+└── web/                     # Web Application
+    └── src/
+        ├── components/      # React components (Canvas, Toolbar, PropertyPanel)
+        ├── store/           # Zustand store
+        └── hooks/           # Application hooks
 ```
 
 ---

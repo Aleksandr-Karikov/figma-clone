@@ -70,7 +70,7 @@ Step-by-step guide for adding a new shape type to the project.
 
 ## Step 6: Add to UI Toolbar
 
-**File:** `packages/ui/src/components/toolbar/Toolbar.tsx`
+**File:** `apps/web/src/components/Toolbar/Toolbar.tsx`
 
 - Add toolbar button
 - Handle click to create shape
@@ -80,7 +80,7 @@ Step-by-step guide for adding a new shape type to the project.
 
 ## Step 7: Add to Property Panel
 
-**File:** `packages/ui/src/components/properties/PropertyPanel.tsx`
+**File:** `apps/web/src/components/PropertyPanel/PropertyPanel.tsx`
 
 - Add property controls for new shape type
 - Handle property updates

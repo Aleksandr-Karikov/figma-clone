@@ -45,14 +45,17 @@ yarn build        # Build all packages
 figma-clone/
 ├── apps/
 │   ├── web/              # React frontend (Vite + React 18)
+│   │   ├── src/
+│   │   │   ├── components/  # Canvas, Toolbar, PropertyPanel
+│   │   │   ├── store/       # Zustand state management
+│   │   │   └── hooks/       # Application hooks
+│   │   └── ...
 │   └── api/              # NestJS backend (Fastify)
 ├── packages/
-│   ├── core/             # Shared @figma-clone/core
-│   │   ├── domain/       # Business logic & types
-│   │   ├── application/  # Use cases
-│   │   └── infrastructure/ # External dependencies
-│   ├── ui/               # React components
-│   └── store/            # Zustand state management
+│   └── core/             # Shared @figma-clone/core
+│       ├── domain/       # Business logic & types
+│       ├── application/  # Use cases
+│       └── infrastructure/ # External dependencies (renderers)
 └── context/              # 📚 Architecture docs (READ THIS!)
 ```
 
@@ -157,13 +160,14 @@ Project built on 5 primitives:
 
 **State:**
 
-- Use Zustand store from `packages/store`
+- Use Zustand store from `apps/web/src/store`
 - All changes through operations (Operations)
 - Undo/redo support via Command pattern
 
 **Monorepo:**
 
-- Use workspaces: `@figma-clone/core`, `@figma-clone/ui`, `@figma-clone/store`
+- Use workspaces: `@figma-clone/core` (shared domain logic)
+- Application-specific code in `apps/web` (components, store, hooks)
 - Turbo caches builds automatically
 - Yarn workspaces manages dependencies
 
@@ -184,15 +188,15 @@ Project built on 5 primitives:
 3. Add factory in `packages/core/src/domain/shapes/factories.ts`
 4. Implement rendering in `packages/core/src/infrastructure/renderers/KonvaRenderer.ts`
 5. Add creation operation in `packages/core/src/domain/operations/`
-6. Update UI toolbar component in `packages/ui/src/toolbar/`
-7. Update store in `packages/store/src/canvasStore.ts`
+6. Update UI toolbar component in `apps/web/src/components/Toolbar/`
+7. Update store in `apps/web/src/store/canvasStore.ts`
 
 ### Adding a New Property to Shapes
 
 1. Update `BaseShape` or specific interface in `packages/core/src/domain/shapes/types.ts`
 2. Update `IRenderer` interface in `packages/core/src/infrastructure/renderers/IRenderer.ts`
 3. Implement in `KonvaRenderer.ts`
-4. Add control in `packages/ui/src/components/properties/PropertyPanel.tsx`
+4. Add control in `apps/web/src/components/PropertyPanel/PropertyPanel.tsx`
 5. Update update operation in `packages/core/src/domain/operations/UpdateShapeOperation.ts`
 
 ---
@@ -233,8 +237,9 @@ Project built on 5 primitives:
 
 - `packages/core/src/domain/` - Canonical types and domain logic
 - `packages/core/src/infrastructure/renderers/` - Renderer abstraction
-- `packages/ui/src/components/` - React components
-- `packages/store/src/` - Zustand stores
+- `apps/web/src/components/` - React components (Canvas, Toolbar, PropertyPanel)
+- `apps/web/src/store/` - Zustand store
+- `apps/web/src/hooks/` - Application hooks
 - `context/concepts/` - Architecture documentation
 
 ---

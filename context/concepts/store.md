@@ -40,7 +40,7 @@ State management via Zustand + Immer.
 - Immutable updates via Immer
 - Actions update state through `set`
 
-**Location:** `packages/store/src/canvasStore.ts`
+**Location:** `apps/web/src/store/canvasStore.ts`
 
 ---
 

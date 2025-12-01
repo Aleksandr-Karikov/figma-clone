@@ -19,9 +19,10 @@ React patterns, components, hooks, and best practices for UI layer.
 
 **File Organization:**
 
-- Components in `packages/ui/src/components/`
-- Hooks in `packages/ui/src/hooks/`
-- Utils in `packages/ui/src/utils/`
+- Components in `apps/web/src/components/`
+- Hooks in `apps/web/src/hooks/`
+- Store in `apps/web/src/store/`
+- Utils in `apps/web/src/utils/` (if needed)
 
 ---
 

@@ -11,6 +11,10 @@ import {
   createDocument,
 } from "@figma-clone/core";
 import {
+  exportDocumentToFile,
+  loadDocumentFromFile,
+} from "@/utils/documentFileUtils";
+import {
   IOperation,
   CreateShapeOperation,
   UpdateShapeOperation,
@@ -36,6 +40,8 @@ export interface CanvasState {
   // Actions
   setDocument: (document: CanvasDocument) => void;
   createNewDocument: (name: string, width?: number, height?: number) => void;
+  saveDocument: (filename?: string) => void;
+  loadDocument: (file: File) => Promise<void>;
 
   // Shape actions
   addShape: (shape: Shape) => void;
@@ -46,7 +52,14 @@ export interface CanvasState {
   // Selection actions
   selectShape: (shapeId: string) => void;
   selectShapes: (shapeIds: string[]) => void;
+  selectAll: () => void;
   deselectAll: () => void;
+
+  // Duplicate
+  duplicateSelectedShapes: () => void;
+
+  // Move with arrow keys
+  moveSelectedShapes: (deltaX: number, deltaY: number) => void;
 
   // Operation actions
   addOperation: (operation: IOperation) => void;
@@ -92,6 +105,22 @@ export const useCanvasStore = create<CanvasState>()((set, get) => ({
         state.currentOperationIndex = -1;
       })
     ),
+
+  saveDocument: (filename) => {
+    const state = get();
+    if (!state.document) return;
+    exportDocumentToFile(state.document, filename);
+  },
+
+  loadDocument: async (file) => {
+    try {
+      const document = await loadDocumentFromFile(file);
+      get().setDocument(document);
+    } catch (error) {
+      console.error("Failed to load document:", error);
+      throw error;
+    }
+  },
 
   // Shape actions
   addShape: (shape) => {
@@ -190,6 +219,53 @@ export const useCanvasStore = create<CanvasState>()((set, get) => ({
         };
       })
     ),
+
+  selectAll: () => {
+    const state = get();
+    if (!state.document) return;
+    const allShapeIds = state.document.shapes.map((s) => s.id);
+    state.selectShapes(allShapeIds);
+  },
+
+  duplicateSelectedShapes: () => {
+    const state = get();
+    if (!state.document || state.selection.shapeIds.length === 0) return;
+
+    const duplicatedIds: string[] = [];
+    const offset = 20; // Offset for duplicated shapes
+
+    state.selection.shapeIds.forEach((shapeId) => {
+      const shape = state.document!.shapes.find((s) => s.id === shapeId);
+      if (shape) {
+        // Create a copy with new ID and offset position
+        const duplicated = {
+          ...shape,
+          id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          x: shape.x + offset,
+          y: shape.y + offset,
+        };
+        state.addShape(duplicated);
+        duplicatedIds.push(duplicated.id);
+      }
+    });
+
+    // Select duplicated shapes
+    if (duplicatedIds.length > 0) {
+      state.selectShapes(duplicatedIds);
+    }
+  },
+
+  moveSelectedShapes: (deltaX, deltaY) => {
+    const state = get();
+    if (!state.document || state.selection.shapeIds.length === 0) return;
+
+    state.selection.shapeIds.forEach((shapeId) => {
+      const shape = state.document!.shapes.find((s) => s.id === shapeId);
+      if (shape) {
+        state.moveShape(shapeId, shape.x + deltaX, shape.y + deltaY);
+      }
+    });
+  },
 
   // Operation actions
   addOperation: (operation) =>

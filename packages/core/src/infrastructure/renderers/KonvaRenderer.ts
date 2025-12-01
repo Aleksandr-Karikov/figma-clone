@@ -437,7 +437,10 @@ export class KonvaRenderer implements IRenderer {
     node.on("click", (e) => {
       // Stop event propagation to prevent stage click event
       e.cancelBubble = true;
-      this.emit("shape:click", { type: "shape:click", shapeId });
+      this.emit("shape:click", {
+        type: "shape:click",
+        shapeId,
+      });
     });
 
     node.on("dragmove", () => {

@@ -32,7 +32,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     renderer.init(containerRef.current, width, height);
     rendererRef.current = renderer;
 
-    // Handle renderer events
+    // Handle shape click
     renderer.on("shape:click", (event) => {
       if (event.shapeId) {
         selectShape(event.shapeId);
@@ -68,7 +68,6 @@ export const Canvas: React.FC<CanvasProps> = ({
   // Sync selection with renderer
   useEffect(() => {
     if (!rendererRef.current) return;
-
     rendererRef.current.setSelection(selection.shapeIds);
   }, [selection.shapeIds]);
 
@@ -84,4 +83,3 @@ export const Canvas: React.FC<CanvasProps> = ({
     />
   );
 };
-

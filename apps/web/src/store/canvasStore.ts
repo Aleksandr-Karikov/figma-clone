@@ -21,7 +21,7 @@ import {
 /**
  * Canvas store state
  */
-interface CanvasState {
+export interface CanvasState {
   // Document
   document: CanvasDocument | null;
 

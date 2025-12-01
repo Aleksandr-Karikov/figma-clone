@@ -89,6 +89,11 @@ export interface IRenderer {
   hitTest(x: number, y: number): string | undefined;
 
   /**
+   * Set selected shapes (for visual highlighting)
+   */
+  setSelection(shapeIds: string[]): void;
+
+  /**
    * Subscribe to renderer events
    */
   on(event: RendererEventType, handler: RendererEventHandler): void;

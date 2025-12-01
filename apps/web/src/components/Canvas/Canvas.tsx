@@ -3,7 +3,7 @@
  */
 
 import React, { useEffect, useRef } from "react";
-import { useCanvasStore } from "@figma-clone/store";
+import { useCanvasStore } from "@/store/canvasStore";
 import { createRenderer, IRenderer } from "@figma-clone/core";
 
 interface CanvasProps {
@@ -84,3 +84,4 @@ export const Canvas: React.FC<CanvasProps> = ({
     />
   );
 };
+

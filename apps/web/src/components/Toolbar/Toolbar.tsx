@@ -2,9 +2,14 @@
  * Toolbar component for creating shapes
  */
 
-import React from 'react';
-import { useCanvasStore } from '@figma-clone/store';
-import { createRectangle, createCircle, createText, ShapeType } from '@figma-clone/core';
+import React from "react";
+import { useCanvasStore } from "@/store/canvasStore";
+import {
+  createRectangle,
+  createCircle,
+  createText,
+  ShapeType,
+} from "@figma-clone/core";
 
 export const Toolbar: React.FC = () => {
   const document = useCanvasStore((state) => state.document);
@@ -19,14 +24,14 @@ export const Toolbar: React.FC = () => {
 
     let shape;
     switch (type) {
-      case 'rectangle':
+      case "rectangle":
         shape = createRectangle(x, y, 200, 100);
         break;
-      case 'circle':
+      case "circle":
         shape = createCircle(x, y, 200, 200);
         break;
-      case 'text':
-        shape = createText(x, y, 'Hello, World!');
+      case "text":
+        shape = createText(x, y, "Hello, World!");
         break;
     }
 
@@ -38,21 +43,21 @@ export const Toolbar: React.FC = () => {
   return (
     <div className="toolbar flex gap-2 p-4 bg-gray-100 border-b">
       <button
-        onClick={() => handleCreateShape('rectangle')}
+        onClick={() => handleCreateShape("rectangle")}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         disabled={!document}
       >
         Rectangle
       </button>
       <button
-        onClick={() => handleCreateShape('circle')}
+        onClick={() => handleCreateShape("circle")}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         disabled={!document}
       >
         Circle
       </button>
       <button
-        onClick={() => handleCreateShape('text')}
+        onClick={() => handleCreateShape("text")}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         disabled={!document}
       >

@@ -18,10 +18,13 @@ import { Shape, Rectangle, Circle, Text } from "../../domain/shapes/types";
 export class KonvaRenderer implements IRenderer {
   private stage: Konva.Stage | null = null;
   private layer: Konva.Layer | null = null;
+  private selectionLayer: Konva.Layer | null = null;
   private shapeMap: Map<string, Konva.Shape> = new Map();
+  private selectionMap: Map<string, Konva.Rect> = new Map();
   private eventHandlers: Map<RendererEventType, Set<RendererEventHandler>> =
     new Map();
   private shapes: Shape[] = [];
+  private selectedShapeIds: Set<string> = new Set();
 
   init(container: HTMLElement, width: number, height: number): void {
     if (this.stage) {
@@ -35,13 +38,26 @@ export class KonvaRenderer implements IRenderer {
     });
 
     this.layer = new Konva.Layer();
+    this.selectionLayer = new Konva.Layer();
     this.stage.add(this.layer);
+    this.stage.add(this.selectionLayer);
 
-    // Handle canvas clicks
-    this.stage.on("click", () => {
-      const pos = this.stage!.getPointerPosition();
-      if (pos) {
-        this.emit("canvas:click", { type: "canvas:click", x: pos.x, y: pos.y });
+    // Handle canvas clicks (only when clicking on stage, not on shapes)
+    this.stage.on("click", (e) => {
+      // Only emit canvas:click if we clicked directly on the stage/background
+      // If we clicked on a shape, the shape's click handler will handle it
+      const target = e.target;
+      // Check if target is stage or one of the layers (not a shape)
+      const isShape = this.shapeMap.has(target.id());
+      if (!isShape) {
+        const pos = this.stage!.getPointerPosition();
+        if (pos) {
+          this.emit("canvas:click", {
+            type: "canvas:click",
+            x: pos.x,
+            y: pos.y,
+          });
+        }
       }
     });
   }
@@ -81,8 +97,19 @@ export class KonvaRenderer implements IRenderer {
       ];
     }
 
+    // Update selection rect if shape is selected
+    if (this.selectedShapeIds.has(shape.id)) {
+      const selectionRect = this.selectionMap.get(shape.id);
+      if (selectionRect) {
+        this.updateSelectionRect(selectionRect, shape);
+      }
+    }
+
     if (this.layer) {
       this.layer.draw();
+    }
+    if (this.selectionLayer) {
+      this.selectionLayer.draw();
     }
   }
 
@@ -159,6 +186,72 @@ export class KonvaRenderer implements IRenderer {
     return undefined;
   }
 
+  setSelection(shapeIds: string[]): void {
+    if (!this.selectionLayer) return;
+
+    const newSelection = new Set(shapeIds);
+
+    // Remove selection for shapes that are no longer selected
+    for (const [id, selectionRect] of this.selectionMap) {
+      if (!newSelection.has(id)) {
+        selectionRect.destroy();
+        this.selectionMap.delete(id);
+      }
+    }
+
+    // Add selection for newly selected shapes
+    for (const shapeId of shapeIds) {
+      if (!this.selectionMap.has(shapeId)) {
+        const shape = this.shapes.find((s) => s.id === shapeId);
+        if (shape) {
+          const selectionRect = this.createSelectionRect(shape);
+          this.selectionLayer.add(selectionRect);
+          this.selectionMap.set(shapeId, selectionRect);
+        }
+      } else {
+        // Update existing selection rect
+        const shape = this.shapes.find((s) => s.id === shapeId);
+        const selectionRect = this.selectionMap.get(shapeId);
+        if (shape && selectionRect) {
+          this.updateSelectionRect(selectionRect, shape);
+        }
+      }
+    }
+
+    this.selectedShapeIds = newSelection;
+    if (this.selectionLayer) {
+      this.selectionLayer.draw();
+    }
+  }
+
+  /**
+   * Create selection rectangle for a shape
+   */
+  private createSelectionRect(shape: Shape): Konva.Rect {
+    const padding = 4;
+    return new Konva.Rect({
+      x: shape.x - padding,
+      y: shape.y - padding,
+      width: shape.width + padding * 2,
+      height: shape.height + padding * 2,
+      stroke: "#3b82f6",
+      strokeWidth: 2,
+      dash: [5, 5],
+      listening: false,
+    });
+  }
+
+  /**
+   * Update selection rectangle position and size
+   */
+  private updateSelectionRect(rect: Konva.Rect, shape: Shape): void {
+    const padding = 4;
+    rect.x(shape.x - padding);
+    rect.y(shape.y - padding);
+    rect.width(shape.width + padding * 2);
+    rect.height(shape.height + padding * 2);
+  }
+
   on(event: RendererEventType, handler: RendererEventHandler): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
@@ -178,9 +271,12 @@ export class KonvaRenderer implements IRenderer {
       this.stage.destroy();
       this.stage = null;
       this.layer = null;
+      this.selectionLayer = null;
       this.shapeMap.clear();
+      this.selectionMap.clear();
       this.eventHandlers.clear();
       this.shapes = [];
+      this.selectedShapeIds.clear();
     }
   }
 
@@ -338,7 +434,9 @@ export class KonvaRenderer implements IRenderer {
    * Setup event handlers for shape
    */
   private setupShapeEvents(node: Konva.Shape, shapeId: string): void {
-    node.on("click", () => {
+    node.on("click", (e) => {
+      // Stop event propagation to prevent stage click event
+      e.cancelBubble = true;
       this.emit("shape:click", { type: "shape:click", shapeId });
     });
 
